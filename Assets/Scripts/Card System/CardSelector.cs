@@ -17,6 +17,23 @@ public class CardSelector : MonoBehaviour
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public CardBase cardBase;
+
+    public float FetchStat(int statNum)
+    {
+        switch (statNum)
+        {
+            case 0:
+                return projectileSize;
+            case 1:
+                return targetSpeed;
+            case 2:
+                return targetSize;
+            case 3:
+                return targetDuration;
+            default:
+                return 0.0f;
+        }
+    }
     void DrawCards()
     {
         CardBase card1 = new CardBase();
@@ -54,6 +71,9 @@ public class CardSelector : MonoBehaviour
 
             writtenStat = statToString[card.positiveStatChosen];
             statValue = statToValue[card.positiveStatChosen];
+
+            statToString.Remove(card.positiveStatChosen);
+            statToValue.Remove(card.positiveStatChosen);
 
             projectileSize = Random.Range(5.0f, 8.0f);
             targetSpeed = Random.Range(-5.0f, -8.0f);
