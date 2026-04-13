@@ -72,9 +72,6 @@ public class CardSelector : MonoBehaviour
             writtenStat = statToString[card.positiveStatChosen];
             statValue = statToValue[card.positiveStatChosen];
 
-            statToString.Remove(card.positiveStatChosen);
-            statToValue.Remove(card.positiveStatChosen);
-
             projectileSize = Random.Range(5.0f, 8.0f);
             targetSpeed = Random.Range(-5.0f, -8.0f);
             targetSize = Random.Range(3.0f, 5.0f);
