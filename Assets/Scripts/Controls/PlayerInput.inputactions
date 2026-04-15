@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "name": "PlayerInput",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "c5965ce9-c947-4530-aa01-5b69fa5eafa5",
+            "actions": [
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "d4fd3a97-b93c-45aa-929c-bcf142dcb2b2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LookH",
+                    "type": "Value",
+                    "id": "69efc077-764d-407d-bf14-ce08c0765420",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "LookV",
+                    "type": "Value",
+                    "id": "299b3742-1f2e-4f4a-86c7-32d046ec042e",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d7f5f978-aa42-4b61-a6d8-e4382d24206d",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4d2fdf19-d35b-41aa-bc51-47c141ed3f60",
+                    "path": "<Mouse>/delta/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LookH",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8ee9664f-b4c3-4e80-98bd-e8e2b86f6de7",
+                    "path": "<Mouse>/delta/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LookV",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

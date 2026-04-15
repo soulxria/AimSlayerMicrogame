@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class GameState : MonoBehaviour
+public class Target : MonoBehaviour
 {
-    public CardSelector cardSelectorScript;
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

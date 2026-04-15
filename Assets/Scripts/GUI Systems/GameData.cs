@@ -16,6 +16,17 @@ public class GameData : MonoBehaviour
 
     private bool gameStarted = false;
 
+    public float setSens(float Sens)
+    {
+        sensMultiplier = Sens;
+        return sensMultiplier;
+    }
+
+    public float getSens()
+    {
+        return sensMultiplier;
+    }
+
     int UpdateHighScore(int score)
     {
         if (score > highScore)
