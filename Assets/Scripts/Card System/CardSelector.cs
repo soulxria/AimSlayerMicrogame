@@ -20,6 +20,10 @@ public class CardSelector : MonoBehaviour
     float statValue;
     float negStatValue;
 
+    public TextMeshProUGUI card1Text;
+    public TextMeshProUGUI card2Text;   
+    public TextMeshProUGUI card3Text;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public CardBase cardBase;
 
@@ -57,6 +61,8 @@ public class CardSelector : MonoBehaviour
         StatBreakdown(card2);
         CardBase card3 = new CardBase();
         StatBreakdown(card3);
+
+
     }
 
     void StatBreakdown(CardBase card)
@@ -118,4 +124,16 @@ public class CardSelector : MonoBehaviour
 
     }
 
+    void CardVisOutput(CardBase card)
+    {
+        //use the written stat to output to the UI
+        if (card.twoWay)
+        {
+            //output writtenStat and writtenNegStat to the UI
+        }
+        else
+        {
+            //output writtenStat to the UI
+        }
+    }
 }

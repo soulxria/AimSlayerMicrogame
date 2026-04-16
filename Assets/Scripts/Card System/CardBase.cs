@@ -11,8 +11,11 @@ public class CardBase: MonoBehaviour
     public string negativeStatChosen;
 
     //list of stats to choose from when creating cards
-    
-    void Start()
+    private void Start()
+    {
+            CardBuiler();
+    }
+    void CardBuiler()
     {
         List<string> statsList = new List<string> { "projectileSize", "targetSpeed", "targetSize", "targetDuration" };
         twoWay = Random.Range(0, 2) == 0;

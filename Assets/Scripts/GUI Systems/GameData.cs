@@ -18,6 +18,7 @@ public class GameData : MonoBehaviour
     private int targetCount;
     protected float spawnGap;
     protected float spawnTimer;
+    protected float cardSelectTime;
 
     private bool gameStarted = false;
 
@@ -114,6 +115,9 @@ public class GameData : MonoBehaviour
         }
     }
 
+
+
+    //spawn gap code, used to skip the spawn gap when a target is hit, allowing for faster gameplay and more targets on screen.
     public void SkipGap()
     {
         spawnTimer = 0f;
@@ -126,6 +130,8 @@ public class GameData : MonoBehaviour
             yield return new WaitUntil(() => spawnTimer <= 0f);
     }
 
+
+    //round timer code, used to skip the round when the time limit is up, allowing for faster gameplay and more rounds.
     public void SkipRound()
     {
         timeRemaining = 0f;
@@ -135,7 +141,21 @@ public class GameData : MonoBehaviour
     {
         timeRemaining = timeLimit;
         yield return new WaitUntil(() => timeRemaining <= 0f);
+        StartCoroutine(CardSelectionCycle());
     }
+
+    public void SkipCardSelect()
+    {
+        cardSelectTime = 0f;
+    }
+    IEnumerator CardSelectionCycle()
+    {
+        cardSelectTime = 8f;
+        yield return new WaitUntil(() => cardSelectTime <= 0f);
+    }
+
+
+
 
     void Update() //timers to avoid confliction with double coroutines
     {
@@ -147,7 +167,16 @@ public class GameData : MonoBehaviour
         {
             spawnTimer -= Time.deltaTime;
         }
+        if (cardSelectTime > 0f)
+        {
+            cardSelectTime -= Time.deltaTime;
+        }
 
+
+        if (cardSelectTime <= 0f)
+        {
+            cardSelectTime = 0f;
+        }
         if (timeRemaining <= 0f)
         {
             timeRemaining = 0f;
