@@ -7,25 +7,53 @@ public class TargetManager : MonoBehaviour
     public GameObject target;
     public GameObject targetPlane;
     public CardSelector cardSelector;
+    public GameData gameData;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         for (int i = 0; i < 10; i++)
         {
-            Instantiate(target);
-            target.SetActive(false);
-            targetPool.Enqueue(target);
+            GameObject targetInstance = Instantiate(target);
+            targetInstance.SetActive(false);
+            targetPool.Enqueue(targetInstance);
         }
     }
 
     // Update is called
     // Spawn Target
     // Randomize size and position on plane
-    void SpawnTarget() 
+    public GameObject SpawnTarget(float additiveSize) 
     {
         GameObject currentTarget = targetPool.Dequeue();
-        target.transform.localScale = new Vector3(cardSelector.FetchStat(2), cardSelector.FetchStat(2), 0);
-        target.transform.position = new Vector3(Random.Range(-targetPlane.transform.localScale.x, targetPlane.transform.localScale.x), Random.Range(-targetPlane.transform.localScale.y, targetPlane.transform.localScale.y), 0);
+        if (additiveSize != 0f) //avoid a divide by zero error.
+        {
+            currentTarget.transform.localScale = new Vector3((5f * (1f + (additiveSize) / 100f)), 0f, (5f * (1f + additiveSize / 100f)));
+        }
+        else
+        {
+            currentTarget.transform.localScale = new Vector3(2f, 0f, 2f);
+        }
+        currentTarget.transform.position = new Vector3(
+            Random.Range(targetPlane.transform.position.x - targetPlane.transform.localScale.x ,targetPlane.transform.position.x + targetPlane.transform.localScale.x),
+            Random.Range(targetPlane.transform.position.y - targetPlane.transform.localScale.y ,targetPlane.transform.position.y + targetPlane.transform.localScale.y), 
+            targetPlane.transform.position.z - 3f);
         currentTarget.SetActive(true);
+
+        return currentTarget;
+    }
+
+    public void TargetMissed(GameObject targetShot)
+    {
+        targetShot.SetActive(false);
+        targetPool.Enqueue(targetShot);
+    }
+
+    public void TargetHit(GameObject targetShot)
+    {
+        targetShot.SetActive(false);
+        targetPool.Enqueue(targetShot);
+        gameData.decrementTargetCount();
+        gameData.SkipGap();
+        Debug.Log("Target Hit!"+" Remaining Targets: " + (gameData.GetTargetCount())); 
     }
 }

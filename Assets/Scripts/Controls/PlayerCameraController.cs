@@ -7,6 +7,9 @@ public class PlayerCameraController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     public GameData gameData;
+    public CardSelector cardStats;
+    public TargetManager targetManager;
+
     private float xRotation;
     private float sensitivity;
     public Transform playerBody;
@@ -37,12 +40,17 @@ public class PlayerCameraController : MonoBehaviour
     public void ShootProjectile(InputAction.CallbackContext context)
     {
         RaycastHit hit;
-        if (Physics.SphereCast(camTransform.position, 10f, camTransform.forward, out hit, 100f))
+        if (Physics.SphereCast(camTransform.position, (5f + cardStats.FetchStat(CardSelector.StatType.ProjectileSize)), camTransform.forward, out hit, 100f))
         {
             if (hit.collider.gameObject.CompareTag("Target"))
+            {
+                targetManager.TargetHit(hit.collider.gameObject);
+            }
+            if (hit.collider.gameObject.CompareTag("StartTarget"))
             {
                 Destroy(hit.collider.gameObject);
             }
         }
+
     }
 }

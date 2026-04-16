@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class StartTarget : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public GameData gameData;
+    private void OnDestroy()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        gameData.InitiateGame();
     }
 }
