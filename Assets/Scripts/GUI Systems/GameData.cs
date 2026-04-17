@@ -141,16 +141,17 @@ public class GameData : MonoBehaviour
     {
         timeRemaining = timeLimit;
         yield return new WaitUntil(() => timeRemaining <= 0f);
-        StartCoroutine(CardSelectionCycle());
+        yield return StartCoroutine(CardSelectionCycle());
     }
 
-    public void SkipCardSelect()
+    public void EndCardSelect()
     {
         cardSelectTime = 0f;
     }
     IEnumerator CardSelectionCycle()
     {
         cardSelectTime = 8f;
+        cardSelector.DrawCards();
         yield return new WaitUntil(() => cardSelectTime <= 0f);
     }
 
