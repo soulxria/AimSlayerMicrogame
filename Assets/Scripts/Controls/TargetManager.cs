@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class TargetManager : MonoBehaviour
 {
-    private Queue<GameObject> targetPool = new Queue<GameObject>();
+    private Queue<GameObject> targetPool = new Queue<GameObject>(10);
     public GameObject target;
     public GameObject targetPlane;
     public CardSelector cardSelector;
@@ -24,22 +24,24 @@ public class TargetManager : MonoBehaviour
     // Randomize size and position on plane
     public GameObject SpawnTarget(float additiveSize) 
     {
+       
         GameObject currentTarget = targetPool.Dequeue();
         if (additiveSize != 0f) //avoid a divide by zero error.
         {
-            currentTarget.transform.localScale = new Vector3((5f * (1f + (additiveSize) / 100f)), 0f, (5f * (1f + additiveSize / 100f)));
+            currentTarget.transform.localScale = new Vector3((2f * (1f + (additiveSize) / 100f)), 0f, (2f * (1f + additiveSize / 100f)));
         }
         else
         {
             currentTarget.transform.localScale = new Vector3(2f, 0f, 2f);
         }
         currentTarget.transform.position = new Vector3(
-            Random.Range(targetPlane.transform.position.x - targetPlane.transform.localScale.x ,targetPlane.transform.position.x + targetPlane.transform.localScale.x),
-            Random.Range(targetPlane.transform.position.y - targetPlane.transform.localScale.y ,targetPlane.transform.position.y + targetPlane.transform.localScale.y), 
-            targetPlane.transform.position.z - 3f);
+            Random.Range(targetPlane.transform.position.x - targetPlane.transform.localScale.x*2, targetPlane.transform.position.x + targetPlane.transform.localScale.x*2),
+            Random.Range(targetPlane.transform.position.y - targetPlane.transform.localScale.y*40, targetPlane.transform.position.y + targetPlane.transform.localScale.y*40),
+            targetPlane.transform.position.z - 2f);
         currentTarget.SetActive(true);
 
         return currentTarget;
+
     }
 
     public void TargetMissed(GameObject targetShot)

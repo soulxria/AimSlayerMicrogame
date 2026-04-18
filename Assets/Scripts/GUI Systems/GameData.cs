@@ -1,28 +1,38 @@
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class GameData : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public TargetManager targetManager;
     public CardSelector cardSelector;
-    private bool roundActive;
+    public StartTarget startTarget;
+    [SerializeField] private bool roundActive;
+    public PlayerCameraController playerCameraController;
 
     private float sensMultiplier = 1.0f;
     private int highScore = 0;
     int currentRound;
 
-    protected float timeLimit;
-    protected float timeRemaining;
-    private int targetCount;
-    protected float spawnGap;
-    protected float spawnTimer;
-    protected float cardSelectTime;
+    public TMPro.TextMeshProUGUI startText;
+
+    [SerializeField] protected float timeLimit;
+    [SerializeField] protected float timeRemaining;
+    [SerializeField] private int targetCount;
+    [SerializeField] protected float spawnGap;
+    [SerializeField] protected float spawnTimer;
+    [SerializeField] protected float cardSelectTime;
+
+    Coroutine roundActiveCR;
+    Coroutine midRoundCR;
+    Coroutine roundCycleTimeCR;
+    Coroutine cardSelectCR;
+    Coroutine spawnCycleCR;
 
     private bool gameStarted = false;
-
-    public Coroutine spawnGapRoutine;
 
     public float setSens(float Sens)
     {
@@ -56,6 +66,7 @@ public class GameData : MonoBehaviour
 
     public void InitiateGame()
     {
+        startText.enabled = false;
         StartRound();
     }
 
@@ -64,32 +75,67 @@ public class GameData : MonoBehaviour
     {
         currentRound++;
         Debug.Log("Round " + currentRound + " Starting.");
-        spawnGap = 1.5f + cardSelector.FetchStat(CardSelector.StatType.TargetDuration);
-        timeLimit = 30.0f - (Mathf.Log(currentRound, 10));
-        targetCount = Mathf.FloorToInt(10f + (Mathf.Log(currentRound, 1.6f)));
+        spawnGap = 1.2f + cardSelector.FetchStat(CardSelector.StatType.TargetDuration);
+        timeLimit = 20.0f - (Mathf.Log(currentRound, 10));
+        targetCount = Mathf.FloorToInt(12f + (Mathf.Log(currentRound, 1.6f)));
         gameStarted = true;
-        roundActive = true;
+
         //start timer for end round
-        StartCoroutine(CycleRoundTimer());
-        StartCoroutine(ActiveRound());
+        timeRemaining = timeLimit;
+        roundCycleTimeCR = StartCoroutine(CycleRoundTimer());
+        roundActiveCR = StartCoroutine(ActiveGame());
     }
 
-    IEnumerator ActiveRound()
+    public void EndGame(int fromPauseMenu)
+    {
+        if (fromPauseMenu == 0)
+        {
+            gameStarted = false;
+            Debug.Log("Game Ended. Final Score: " + (currentRound - 1) + " High Score: " + CheckHighScore(currentRound - 1));
+            startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
+            currentRound = 0;
+            cardSelector.ResetStats();
+            startText.enabled = true;
+        }
+        else if (fromPauseMenu == 1)
+        {
+            gameStarted = false;
+            Debug.Log("Game Ended. Final Score: " + (currentRound - 1) + " High Score: " + CheckHighScore(currentRound - 1));
+            startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
+            currentRound = 0;
+            cardSelector.ResetStats();
+            startText.enabled = true;
+            playerCameraController.ResumeGame();
+        }
+    }
+
+    IEnumerator ActiveGame()
     {
         while (gameStarted == true)
         {
-            yield return StartCoroutine(RoundActivity()); //start round activity, which will end when the target count is zero or the time limit is up.
+            roundActive = true;
+            Debug.Log("Round activity on now" );
+            yield return midRoundCR = StartCoroutine(RoundActivity());
+            StopCoroutine(midRoundCR);//start round activity, which will end when the target count is zero or the time limit is up.
             if (targetCount > 0)
             {
                 break;
             }
             else
             {
+                StopCoroutine(roundCycleTimeCR);
+                cardSelectTime = 8f;
+                cardSelector.DrawCards();
+                yield return cardSelectCR = StartCoroutine(CardSelectionCycle());
+                Debug.Log("Card Selection Ended");
+                StopCoroutine(cardSelectCR);
+                InputSystem.actions.FindAction("Shoot").Enable();
                 StartRound();
             }
         }
-        gameStarted = false;
+        EndGame(0);
         yield return new WaitUntil(() => gameStarted == false);
+        StopCoroutine(roundActiveCR);
     }
 
     IEnumerator RoundActivity()
@@ -106,7 +152,22 @@ public class GameData : MonoBehaviour
 
             Debug.Log("Spawning Target");
             GameObject currentTarget = targetManager.SpawnTarget(cardSelector.FetchStat(CardSelector.StatType.TargetSize));
-            yield return StartCoroutine(CycleSpawnTimer());
+            if (currentTarget == null)
+            {
+                Debug.Log("Too many targets on field, failed to spawn");
+                continue;
+            }
+            if (spawnGap < 0.5f)
+            {
+                spawnGap = 0.5f; //set a minimum spawn gap to avoid overwhelming the player with targets.
+            }
+            else if (spawnGap > 3f)
+            {
+                spawnGap = 3f; //set a maximum spawn gap to avoid excessively long waits between targets.
+            }
+            spawnTimer = spawnGap;
+            yield return spawnCycleCR =StartCoroutine(CycleSpawnTimer());
+            StopCoroutine(spawnCycleCR);
             if (currentTarget != null)
             {
                 targetManager.TargetMissed(currentTarget); //automatically delete
@@ -125,9 +186,8 @@ public class GameData : MonoBehaviour
     // Update is called once per frame
     IEnumerator CycleSpawnTimer()
     {
-        spawnTimer = spawnGap;
-        while (spawnTimer > 0f)
-            yield return new WaitUntil(() => spawnTimer <= 0f);
+       
+        yield return new WaitUntil(() => spawnTimer <= 0f);
     }
 
 
@@ -139,9 +199,8 @@ public class GameData : MonoBehaviour
     // Update is called once per frame
     IEnumerator CycleRoundTimer()
     {
-        timeRemaining = timeLimit;
+        
         yield return new WaitUntil(() => timeRemaining <= 0f);
-        yield return StartCoroutine(CardSelectionCycle());
     }
 
     public void EndCardSelect()
@@ -150,15 +209,16 @@ public class GameData : MonoBehaviour
     }
     IEnumerator CardSelectionCycle()
     {
-        cardSelectTime = 8f;
-        cardSelector.DrawCards();
+        Debug.Log("Card Selection Started");
+        InputSystem.actions.FindAction("Shoot").Disable();
         yield return new WaitUntil(() => cardSelectTime <= 0f);
+        cardSelector.DisableCards();
     }
 
 
 
 
-    void Update() //timers to avoid confliction with double coroutines
+    void FixedUpdate() //timers to avoid confliction with double coroutines
     {
         if (timeRemaining > 0f)
         {

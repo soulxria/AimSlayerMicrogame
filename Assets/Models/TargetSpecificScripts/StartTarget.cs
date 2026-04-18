@@ -3,7 +3,7 @@ using UnityEngine;
 public class StartTarget : MonoBehaviour
 {
     public GameData gameData;
-    private void OnDestroy()
+    private void OnDisable()
     {
         gameData.InitiateGame();
     }
