@@ -28,7 +28,7 @@ public class TargetManager : MonoBehaviour
         GameObject currentTarget = targetPool.Dequeue();
         if (additiveSize != 0f) //avoid a divide by zero error.
         {
-            currentTarget.transform.localScale = new Vector3((2f * (1f + (additiveSize) / 100f)), 0f, (2f * (1f + additiveSize / 100f)));
+            currentTarget.transform.localScale = new Vector3((2f * (1f + (additiveSize))), 0f, (2f * (1f + additiveSize)));
         }
         else
         {

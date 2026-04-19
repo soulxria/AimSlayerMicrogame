@@ -28,9 +28,7 @@ public class GameData : MonoBehaviour
 
     Coroutine roundActiveCR;
     Coroutine midRoundCR;
-    Coroutine roundCycleTimeCR;
     Coroutine cardSelectCR;
-    Coroutine spawnCycleCR;
 
     private bool gameStarted = false;
 
@@ -76,13 +74,14 @@ public class GameData : MonoBehaviour
         currentRound++;
         Debug.Log("Round " + currentRound + " Starting.");
         spawnGap = 1.2f + cardSelector.FetchStat(CardSelector.StatType.TargetDuration);
+        spawnGap = Mathf.Clamp(spawnGap, 0.5f, 3);
+        
         timeLimit = 20.0f - (Mathf.Log(currentRound, 10));
         targetCount = Mathf.FloorToInt(12f + (Mathf.Log(currentRound, 1.6f)));
         gameStarted = true;
 
         //start timer for end round
         timeRemaining = timeLimit;
-        roundCycleTimeCR = StartCoroutine(CycleRoundTimer());
         roundActiveCR = StartCoroutine(ActiveGame());
     }
 
@@ -123,7 +122,6 @@ public class GameData : MonoBehaviour
             }
             else
             {
-                StopCoroutine(roundCycleTimeCR);
                 cardSelectTime = 8f;
                 cardSelector.DrawCards();
                 yield return cardSelectCR = StartCoroutine(CardSelectionCycle());
@@ -157,17 +155,9 @@ public class GameData : MonoBehaviour
                 Debug.Log("Too many targets on field, failed to spawn");
                 continue;
             }
-            if (spawnGap < 0.5f)
-            {
-                spawnGap = 0.5f; //set a minimum spawn gap to avoid overwhelming the player with targets.
-            }
-            else if (spawnGap > 3f)
-            {
-                spawnGap = 3f; //set a maximum spawn gap to avoid excessively long waits between targets.
-            }
+
             spawnTimer = spawnGap;
-            yield return spawnCycleCR =StartCoroutine(CycleSpawnTimer());
-            StopCoroutine(spawnCycleCR);
+            yield return new WaitUntil(() => spawnTimer <= 0); //wait until spawn gap is up to spawn the next target, allowing for a consistent spawn rate.
             if (currentTarget != null)
             {
                 targetManager.TargetMissed(currentTarget); //automatically delete
@@ -183,24 +173,13 @@ public class GameData : MonoBehaviour
     {
         spawnTimer = 0f;
     }
-    // Update is called once per frame
-    IEnumerator CycleSpawnTimer()
-    {
-       
-        yield return new WaitUntil(() => spawnTimer <= 0f);
-    }
+
 
 
     //round timer code, used to skip the round when the time limit is up, allowing for faster gameplay and more rounds.
     public void SkipRound()
     {
         timeRemaining = 0f;
-    }
-    // Update is called once per frame
-    IEnumerator CycleRoundTimer()
-    {
-        
-        yield return new WaitUntil(() => timeRemaining <= 0f);
     }
 
     public void EndCardSelect()
@@ -218,7 +197,7 @@ public class GameData : MonoBehaviour
 
 
 
-    void FixedUpdate() //timers to avoid confliction with double coroutines
+    void Update() //timers to avoid confliction with double coroutines
     {
         if (timeRemaining > 0f)
         {
