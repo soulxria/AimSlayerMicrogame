@@ -126,15 +126,15 @@ public class CardSelector : MonoBehaviour
         cardSelectUI.enabled = true;
         Cursor.lockState = CursorLockMode.None;
         
-        card1 = this.AddComponent<CardBase>();//initiate the card base to gather which stats it wants, then break down those stats into values and text for the UI and stat modification
+        card1 = new CardBase();//initiate the card base to gather which stats it wants, then break down those stats into values and text for the UI and stat modification
         StatBreakdown(card1);
         CardVisOutput(card1, card1Text);
         
-        card2 = this.AddComponent<CardBase>();
+        card2 =  new CardBase();
         StatBreakdown(card2);
         CardVisOutput(card2, card2Text);
         
-        card3 = this.AddComponent<CardBase>();
+        card3 = new CardBase();
         StatBreakdown(card3);
         CardVisOutput(card3, card3Text);
          //enable the card select UI when drawing cards
@@ -142,9 +142,9 @@ public class CardSelector : MonoBehaviour
 
     private void PostCardSelection()
     {
-        Destroy(card1);//remove the card base components after selection to avoid stacking cards and stats
-        Destroy(card2);
-        Destroy(card3);
+        card1 = null;//remove old card bases after selection to avoid stacking cards and stats
+        card2 = null;
+        card3 = null;
     }
     void StatBreakdown(CardBase card) //assigns card stats
     {

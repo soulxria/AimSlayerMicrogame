@@ -3,17 +3,15 @@ using NUnit.Framework.Constraints;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class CardBase : MonoBehaviour   
+public class CardBase
 {
-
-
     public bool twoWay;
     public CardSelector.StatType positiveStatChosen;
     public CardSelector.StatType negativeStatChosen;
     //list of stats to choose from when creating cards
-    void Awake()
+    public CardBase()
     {
-            CardBuiler();
+        CardBuiler();
     }
     void CardBuiler()
     {

@@ -119,7 +119,6 @@ public class GameData : MonoBehaviour
             if (targetCount > 0)
             {
                 Debug.Log("Round Ended Due to Time Limit");
-                StopCoroutine(roundCycleTimeCR);
                 break;
             }
             else
