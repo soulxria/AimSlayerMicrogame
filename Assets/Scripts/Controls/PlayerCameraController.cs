@@ -11,6 +11,7 @@ public class PlayerCameraController : MonoBehaviour
     public TargetManager targetManager;
 
     private float xRotation;
+    [SerializeField, Range(0.01f, 1)]
     private float sensitivity = 0;
     public Transform playerBody;
     public Transform camTransform;
@@ -32,14 +33,14 @@ public class PlayerCameraController : MonoBehaviour
     
     public void OnMouseX(InputAction.CallbackContext context)
     {
-        float mouseX = context.ReadValue<float>() * (1 + sensitivity) * Time.deltaTime;
+        float mouseX = context.ReadValue<float>() * (sensitivity) ;
         //playerBody.Rotate(Vector3.up * mouseX);
         transform.Rotate(0f, mouseX, 0f);
     }
 
     public void OnMouseY(InputAction.CallbackContext context)
     {
-        float mouseY = context.ReadValue<float>() * (-1 + -1*sensitivity) * Time.deltaTime;
+        float mouseY = context.ReadValue<float>() * (-sensitivity) ;
         Vector3 newRot = camTransform.rotation.eulerAngles + new Vector3(mouseY, 0f, 0f);
         camTransform.rotation = (Quaternion.Euler(newRot.x, newRot.y , newRot.z));
     }   

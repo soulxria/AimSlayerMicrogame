@@ -28,9 +28,9 @@ public class CardSelector : MonoBehaviour
 
     public Canvas cardSelectUI;
 
-    Dictionary<string, string> statToString;
-    Dictionary<string, float> statToValue;
-    Dictionary<string, StatType> statToEnum;
+    string[] statToString;
+    float[] statToValue;
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public GameData gameData; //reference to the game data to pass the card choice for use in the game
@@ -40,29 +40,21 @@ public class CardSelector : MonoBehaviour
 
     private void Start()
     {   //clamp the stats to reasonable values to avoid breaking the game
-        statToEnum = new Dictionary<string, StatType>() //for value adjustment, getting the correct stat
+        statToString = new string[4]
         {
-            {"projectileSize", StatType.ProjectileSize},
-            {"targetSpeed", StatType.TargetSpeed},
-            {"targetSize", StatType.TargetSize},
-            {"targetDuration", StatType.TargetDuration}
+            "Projectile Size: " + addProjectileSize,
+            "Target Speed: " + addTargetSpeed,
+            "Target Size: " + addTargetSize,
+            "Target Duration: " + addTargetDuration
+        };
+        statToValue = new float[4]
+        {
+            addProjectileSize,
+            addTargetSpeed,
+            addTargetSize,
+            addTargetDuration
         };
 
-        statToString = new Dictionary<string, string>() //for UI purposes
-        {
-            {"projectileSize", "Projectile Size: "+addProjectileSize},
-            {"targetSpeed", "Target Speed: "+addTargetSpeed},
-            {"targetSize", "Target Size: "+addTargetSize},
-            {"targetDuration", "Target Duration: "+addTargetDuration}
-        };
-
-        statToValue = new Dictionary<string, float>() //for value adjustment, gets the value
-        {
-            {"projectileSize", addProjectileSize},
-            {"targetSpeed", addTargetSpeed},
-            {"targetSize", addTargetSize},
-            {"targetDuration", addTargetDuration}
-        };
         cardSelectUI.enabled = false; //make sure the card select UI is disabled at the start of the game
     }
     void UpdateDictionaries(float value1, float value2, float value3, float value4) //initiate only once at start to borrow values instead of each time draw cards is called
@@ -72,20 +64,20 @@ public class CardSelector : MonoBehaviour
             switch (i)
             {
                 case 0:
-                    statToString["projectileSize"] = "Projectile Size: " + value1.ToString("F2");
-                    statToValue["projectileSize"] = value1;
+                    statToString[(int)StatType.ProjectileSize] = "Projectile Size: " + value1.ToString("F2");
+                    statToValue[(int)StatType.ProjectileSize] = value1;
                     break;
                 case 1:
-                    statToString["targetSpeed"] = "Target Speed: " + value2.ToString("F2");
-                    statToValue["targetSpeed"] = value2;
+                    statToString[(int)StatType.TargetSpeed] = "Target Speed: " + value2.ToString("F2");
+                    statToValue[(int)StatType.TargetSpeed] = value2;
                     break;
                 case 2:
-                    statToString["targetSize"] = "Target Size: " + value3.ToString("F2");
-                    statToValue["targetSize"] = value3;
+                    statToString[(int)StatType.TargetSize] = "Target Size: " + value3.ToString("F2");
+                    statToValue[(int)StatType.TargetSize] = value3;
                     break;
                 case 3:
-                    statToString["targetDuration"] = "Target Duration: " + value4.ToString("F2");
-                    statToValue["targetDuration"] = value4;
+                    statToString[(int)StatType.TargetDuration] = "Target Duration: " + value4.ToString("F2");
+                    statToValue[(int)StatType.TargetDuration] = value4;
                     break;                                                      
             }
             
@@ -123,7 +115,8 @@ public class CardSelector : MonoBehaviour
         ProjectileSize,
         TargetSpeed,
         TargetSize,
-        TargetDuration
+        TargetDuration,
+        NUM
     }
 
     public StatType currentStat; //instance enum 
@@ -132,12 +125,15 @@ public class CardSelector : MonoBehaviour
         Debug.Log("Drawing Cards");
         cardSelectUI.enabled = true;
         Cursor.lockState = CursorLockMode.None;
+        
         card1 = this.AddComponent<CardBase>();//initiate the card base to gather which stats it wants, then break down those stats into values and text for the UI and stat modification
         StatBreakdown(card1);
         CardVisOutput(card1, card1Text);
+        
         card2 = this.AddComponent<CardBase>();
         StatBreakdown(card2);
         CardVisOutput(card2, card2Text);
+        
         card3 = this.AddComponent<CardBase>();
         StatBreakdown(card3);
         CardVisOutput(card3, card3Text);
@@ -163,8 +159,8 @@ public class CardSelector : MonoBehaviour
             UpdateDictionaries(addProjectileSize, addTargetSpeed, addTargetSize, addTargetDuration);
 
             //this will gather the text version and value version of the stats for use in the UI and the stat modification, respectively
-            writtenStat = statToString[card.positiveStatChosen];
-            statValue = statToValue[card.positiveStatChosen];
+            writtenStat = statToString[(int)card.positiveStatChosen];
+            statValue = statToValue[(int)card.positiveStatChosen];
 
             //list of additive values that will be inserted for decrement
             addProjectileSize = Random.Range(0.1f, 1.0f);
@@ -174,8 +170,8 @@ public class CardSelector : MonoBehaviour
             UpdateDictionaries(addProjectileSize, addTargetSpeed, addTargetSize, addTargetDuration);
 
             //gather text and value for negative stat
-            writtenNegStat = statToString[card.negativeStatChosen];
-            negStatValue = statToValue[card.negativeStatChosen];
+            writtenNegStat = statToString[(int)card.negativeStatChosen];
+            negStatValue = statToValue[(int)card.negativeStatChosen];
         }
         else
         {
@@ -186,8 +182,8 @@ public class CardSelector : MonoBehaviour
             addTargetDuration = Random.Range(.03f, .07f);
             UpdateDictionaries(addProjectileSize, addTargetSpeed, addTargetSize, addTargetDuration);
 
-            writtenStat = statToString[card.positiveStatChosen];
-            statValue = statToValue[card.positiveStatChosen];
+            writtenStat = statToString[(int)card.positiveStatChosen];
+            statValue = statToValue[(int)card.positiveStatChosen];
         }
     }
 
@@ -197,14 +193,14 @@ public class CardSelector : MonoBehaviour
         if (card.twoWay)
         {
             float positiveModification = statValue;
-            ChangeSpecificStat(statToEnum[card.positiveStatChosen], positiveModification);
+            ChangeSpecificStat(card.positiveStatChosen, positiveModification);
             float negativeModification = -1*negStatValue;
-            ChangeSpecificStat(statToEnum[card.negativeStatChosen], negativeModification);
+            ChangeSpecificStat(card.negativeStatChosen, negativeModification);
         }
         else
         {
             float positiveModification = statValue;
-            ChangeSpecificStat(statToEnum[card.positiveStatChosen], positiveModification);
+            ChangeSpecificStat(card.positiveStatChosen, positiveModification);
         }
         DisableCards(); //close the card select UI after selection
         gameData.EndCardSelect(); //pass the card chosen to the game data for use in the game
