@@ -33,14 +33,14 @@ public class PlayerCameraController : MonoBehaviour
     
     public void OnMouseX(InputAction.CallbackContext context)
     {
-        float mouseX = context.ReadValue<float>() * (sensitivity) ;
+        float mouseX = context.ReadValue<float>() * (sensitivity*0.5f) ;
         //playerBody.Rotate(Vector3.up * mouseX);
         transform.Rotate(0f, mouseX, 0f);
     }
 
     public void OnMouseY(InputAction.CallbackContext context)
     {
-        float mouseY = context.ReadValue<float>() * (-sensitivity) ;
+        float mouseY = context.ReadValue<float>() * (-sensitivity*0.5f) ;
         Vector3 newRot = camTransform.rotation.eulerAngles + new Vector3(mouseY, 0f, 0f);
         camTransform.rotation = (Quaternion.Euler(newRot.x, newRot.y , newRot.z));
     }   
