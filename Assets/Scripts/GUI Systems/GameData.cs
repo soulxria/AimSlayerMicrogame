@@ -17,7 +17,7 @@ public class GameData : MonoBehaviour
     private int highScore = 0;
     int currentRound;
 
-    public TMPro.TextMeshProUGUI startText;
+    public GameObject startTextPanel;
 
     [SerializeField] protected float timeLimit;
     [SerializeField] protected float timeRemaining;
@@ -66,7 +66,7 @@ public class GameData : MonoBehaviour
 
     public void InitiateGame()
     {
-        startText.enabled = false;
+        startTextPanel.SetActive(false);
         StartRound();
     }
 
@@ -95,7 +95,7 @@ public class GameData : MonoBehaviour
             startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
             currentRound = 0;
             cardSelector.ResetStats();
-            startText.enabled = true;
+            startTextPanel.SetActive(true);
         }
         else if (fromPauseMenu == 1)
         {
@@ -104,7 +104,7 @@ public class GameData : MonoBehaviour
             startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
             currentRound = 0;
             cardSelector.ResetStats();
-            startText.enabled = true;
+            startTextPanel.SetActive(true);
             playerCameraController.ResumeGame();
         }
     }
@@ -119,6 +119,8 @@ public class GameData : MonoBehaviour
             StopCoroutine(midRoundCR);//start round activity, which will end when the target count is zero or the time limit is up.
             if (targetCount > 0)
             {
+                Debug.Log("Round Ended Due to Time Limit");
+                StopCoroutine(roundCycleTimeCR);
                 break;
             }
             else
