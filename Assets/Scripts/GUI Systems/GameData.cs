@@ -18,6 +18,8 @@ public class GameData : MonoBehaviour
     int currentRound;
 
     public GameObject startTextPanel;
+    public TMPro.TextMeshProUGUI highScoreText;
+    public TMPro.TextMeshProUGUI targetText;
 
     [SerializeField] protected float timeLimit;
     [SerializeField] protected float timeRemaining;
@@ -78,6 +80,7 @@ public class GameData : MonoBehaviour
         
         timeLimit = 20.0f - (Mathf.Log(currentRound, 10));
         targetCount = Mathf.FloorToInt(12f + (Mathf.Log(currentRound, 1.6f)));
+        UpdateTargetCount();
         gameStarted = true;
 
         //start timer for end round
@@ -92,6 +95,7 @@ public class GameData : MonoBehaviour
             gameStarted = false;
             Debug.Log("Game Ended. Final Score: " + (currentRound - 1) + " High Score: " + CheckHighScore(currentRound - 1));
             startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
+            UpdateHighScore();
             currentRound = 0;
             cardSelector.ResetStats();
             startTextPanel.SetActive(true);
@@ -101,8 +105,10 @@ public class GameData : MonoBehaviour
             gameStarted = false;
             Debug.Log("Game Ended. Final Score: " + (currentRound - 1) + " High Score: " + CheckHighScore(currentRound - 1));
             startTarget.gameObject.SetActive(true); //reactivate start target to allow for restarting the game. 
+            UpdateHighScore();
             currentRound = 0;
             cardSelector.ResetStats();
+            StopCoroutine(roundActiveCR);
             startTextPanel.SetActive(true);
             playerCameraController.ResumeGame();
         }
@@ -116,7 +122,8 @@ public class GameData : MonoBehaviour
             Debug.Log("Round activity on now" );
             yield return midRoundCR = StartCoroutine(RoundActivity());
             StopCoroutine(midRoundCR);//start round activity, which will end when the target count is zero or the time limit is up.
-            if (targetCount > 0)
+            Debug.Log("Round Activity Ended");
+            if (targetCount > 0 && timeRemaining <= 0)
             {
                 Debug.Log("Round Ended Due to Time Limit");
                 break;
@@ -163,8 +170,8 @@ public class GameData : MonoBehaviour
             {
                 targetManager.TargetMissed(currentTarget); //automatically delete
             }
-
         }
+        yield return new WaitUntil(() => roundActive == false);
     }
 
 
@@ -220,12 +227,29 @@ public class GameData : MonoBehaviour
         }
         if (timeRemaining <= 0f)
         {
+            roundActive = false;
             timeRemaining = 0f;
         }
         if (spawnTimer <= 0f)
         {
             spawnTimer = 0f;
         }
+    }
+
+    public void QuitGame()
+    {
+               Application.Quit();
+    }
+
+    void UpdateHighScore()
+    {
+        CheckHighScore(currentRound - 1);
+        highScoreText.text = "High Score: " + highScore;
+    }
+
+    public void UpdateTargetCount()
+    {
+        targetText.text = "Targets Remaining: " + targetCount;
     }
 }
 

@@ -3,7 +3,7 @@ using NUnit.Framework.Constraints;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class CardBase : MonoBehaviour
+public class CardBase 
 {
     public bool twoWay;
     public CardSelector.StatType positiveStatChosen;

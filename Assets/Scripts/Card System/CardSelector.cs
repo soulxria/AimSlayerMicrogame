@@ -55,6 +55,11 @@ public class CardSelector : MonoBehaviour
             addTargetDuration
         };
 
+        projectileSize = 1.0f;
+        targetSpeed = 10.0f;
+        targetSize = 1.0f;
+        targetDuration = 1.0f;
+
         cardSelectUI.enabled = false; //make sure the card select UI is disabled at the start of the game
     }
     void UpdateDictionaries(float value1, float value2, float value3, float value4) //initiate only once at start to borrow values instead of each time draw cards is called

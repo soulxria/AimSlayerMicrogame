@@ -53,6 +53,7 @@ public class PlayerCameraController : MonoBehaviour
             if (hit.collider.gameObject.CompareTag("Target"))
             {
                 targetManager.TargetHit(hit.collider.gameObject);
+                gameData.UpdateTargetCount();
             }
             if (hit.collider.gameObject.CompareTag("StartTarget"))
             {
